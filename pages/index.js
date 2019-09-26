@@ -46,7 +46,7 @@ const Index = function({provider}) {
   return (
     <React.Fragment>
       <div className={classes.header}>
-        <img className={classes.logo} src='/static/logo.png' />
+        <img className={classes.logo} src={`${process.env.BACKEND_URL}/static/logo.png`} />
         <div>My Ethereum Tools</div>
       </div>
       <div className={classes.body}>

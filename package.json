@@ -10,6 +10,7 @@
   "scripts": {
     "build": "next build",
     "export": "next export && touch out/.nojekyll",
+    "gh-page": "next build && next export && touch out/.nojekyll",
     "dev": "next -p 9090"
   },
   "dependencies": {
