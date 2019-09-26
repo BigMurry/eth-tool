@@ -26548,7 +26548,7 @@ var Index = function Index(_ref) {
     __self: this
   }, __jsx("img", {
     className: classes.logo,
-    src: "/static/logo.png",
+    src: "".concat("", "/static/logo.png"),
     __source: {
       fileName: _jsxFileName,
       lineNumber: 49
