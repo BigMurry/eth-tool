@@ -4,13 +4,13 @@
 /*!*********************!*\
   !*** ./lib/core.js ***!
   \*********************/
-/*! exports provided: jsonHash, providerSign */
+/*! exports provided: jsonHash, providerSignObj */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "jsonHash", function() { return jsonHash; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "providerSign", function() { return providerSign; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "providerSignObj", function() { return providerSignObj; });
 /* harmony import */ var _babel_runtime_corejs2_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime-corejs2/regenerator */ "./node_modules/@babel/runtime-corejs2/regenerator/index.js");
 /* harmony import */ var _babel_runtime_corejs2_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_corejs2_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _babel_runtime_corejs2_helpers_esm_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime-corejs2/helpers/esm/asyncToGenerator */ "./node_modules/@babel/runtime-corejs2/helpers/esm/asyncToGenerator.js");
@@ -26,46 +26,56 @@ function jsonHash(obj) {
   var json = json_stable_stringify__WEBPACK_IMPORTED_MODULE_3__(obj);
   return ethers__WEBPACK_IMPORTED_MODULE_2__["utils"].keccak256(ethers__WEBPACK_IMPORTED_MODULE_2__["utils"].toUtf8Bytes(json));
 }
-function providerSign(_x, _x2) {
-  return _providerSign.apply(this, arguments);
+function providerSignObj(_x, _x2) {
+  return _providerSignObj.apply(this, arguments);
 }
 
-function _providerSign() {
-  _providerSign = Object(_babel_runtime_corejs2_helpers_esm_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1__["default"])(
+function _providerSignObj() {
+  _providerSignObj = Object(_babel_runtime_corejs2_helpers_esm_asyncToGenerator__WEBPACK_IMPORTED_MODULE_1__["default"])(
   /*#__PURE__*/
-  _babel_runtime_corejs2_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee(provider, hash) {
-    var signer, addr, sig;
+  _babel_runtime_corejs2_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee(provider, obj) {
+    var msg, signer, addr, sig;
     return _babel_runtime_corejs2_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            _context.prev = 0;
+            // const msg = `coke bet unlock session wallet`;
+            // window.__provider = provider;
+            msg = json_stable_stringify__WEBPACK_IMPORTED_MODULE_3__(obj);
+            _context.prev = 1;
             signer = provider.getSigner();
-            _context.next = 4;
+            _context.next = 5;
             return signer.getAddress();
 
-          case 4:
+          case 5:
             addr = _context.sent;
-            _context.next = 7;
-            return provider.send('personal_sign', [hash, addr.toLowerCase()]);
+            msg = ethers__WEBPACK_IMPORTED_MODULE_2__["utils"].toUtf8Bytes(msg);
+            /*
+            if (provider._web3Provider.isTrust) {
+              window.alert('debug: prepare sign');
+            }
+            */
 
-          case 7:
+            _context.next = 9;
+            return provider.send('personal_sign', [ethers__WEBPACK_IMPORTED_MODULE_2__["utils"].hexlify(msg), addr.toLowerCase()]);
+
+          case 9:
             sig = _context.sent;
             return _context.abrupt("return", sig);
 
-          case 11:
-            _context.prev = 11;
-            _context.t0 = _context["catch"](0);
+          case 13:
+            _context.prev = 13;
+            _context.t0 = _context["catch"](1);
             return _context.abrupt("return", null);
 
-          case 14:
+          case 16:
           case "end":
             return _context.stop();
         }
       }
-    }, _callee, null, [[0, 11]]);
+    }, _callee, null, [[1, 13]]);
   }));
-  return _providerSign.apply(this, arguments);
+  return _providerSignObj.apply(this, arguments);
 }
 
 /***/ }),
@@ -26480,15 +26490,23 @@ var __jsx = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement;
 var useStyles = Object(_material_ui_core_styles__WEBPACK_IMPORTED_MODULE_1__["makeStyles"])(function (theme) {
   return {
     header: {
-      fontSize: theme.spacing(2),
+      fontSize: theme.spacing(3),
       position: 'fixed',
       width: '100%',
       top: 0,
-      padding: theme.spacing(2),
-      backgroundColor: _material_ui_core_colors_grey__WEBPACK_IMPORTED_MODULE_4___default.a[500]
+      paddingLeft: theme.spacing(3),
+      paddingTop: theme.spacing(1),
+      paddingBottom: theme.spacing(1),
+      backgroundColor: _material_ui_core_colors_grey__WEBPACK_IMPORTED_MODULE_4___default.a[500],
+      display: 'flex',
+      alignItems: 'center'
+    },
+    logo: {
+      height: theme.spacing(8),
+      marginRight: theme.spacing(3)
     },
     body: {
-      marginTop: theme.spacing(8),
+      marginTop: theme.spacing(14),
       marginLeft: theme.spacing(4),
       marginRight: theme.spacing(4)
     },
@@ -26518,28 +26536,42 @@ var Index = function Index(_ref) {
   return __jsx(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, {
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 39
+      lineNumber: 47
     },
     __self: this
   }, __jsx("div", {
     className: classes.header,
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 40
+      lineNumber: 48
     },
     __self: this
-  }, "My Ethereum Tools"), __jsx("div", {
+  }, __jsx("img", {
+    className: classes.logo,
+    src: "/static/logo.png",
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 49
+    },
+    __self: this
+  }), __jsx("div", {
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 50
+    },
+    __self: this
+  }, "My Ethereum Tools")), __jsx("div", {
     className: classes.body,
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 41
+      lineNumber: 52
     },
     __self: this
   }, __jsx("div", {
     className: classes.line,
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 42
+      lineNumber: 53
     },
     __self: this
   }, __jsx(_material_ui_core_TextField__WEBPACK_IMPORTED_MODULE_2__["default"], {
@@ -26555,7 +26587,7 @@ var Index = function Index(_ref) {
     variant: "outlined",
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 43
+      lineNumber: 54
     },
     __self: this
   }), __jsx(_material_ui_core_Button__WEBPACK_IMPORTED_MODULE_3__["default"], {
@@ -26563,11 +26595,11 @@ var Index = function Index(_ref) {
     color: "secondary",
     className: classes.btn,
     onClick: function onClick(_) {
-      return Object(_lib_core__WEBPACK_IMPORTED_MODULE_6__["providerSign"])(provider, Object(_lib_core__WEBPACK_IMPORTED_MODULE_6__["jsonHash"])(inputObj)).then(setSig);
+      return Object(_lib_core__WEBPACK_IMPORTED_MODULE_6__["providerSignObj"])(provider, JSON.parse(inputObj)).then(setSig);
     },
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 53
+      lineNumber: 64
     },
     __self: this
   }, "JSON sign"), __jsx(_material_ui_core_TextField__WEBPACK_IMPORTED_MODULE_2__["default"], {
@@ -26581,7 +26613,7 @@ var Index = function Index(_ref) {
     variant: "outlined",
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 60
+      lineNumber: 71
     },
     __self: this
   }))));
