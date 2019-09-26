@@ -4,19 +4,27 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import grey from '@material-ui/core/colors/grey';
 import { connect } from 'react-redux';
-import {jsonHash, providerSign} from '../lib/core';
+import {providerSignObj} from '../lib/core';
 
 const useStyles = makeStyles(theme => ({
   header: {
-    fontSize: theme.spacing(2),
+    fontSize: theme.spacing(3),
     position: 'fixed',
     width: '100%',
     top: 0,
-    padding: theme.spacing(2),
-    backgroundColor: grey[500]
+    paddingLeft: theme.spacing(3),
+    paddingTop: theme.spacing(1),
+    paddingBottom: theme.spacing(1),
+    backgroundColor: grey[500],
+    display: 'flex',
+    alignItems: 'center'
+  },
+  logo: {
+    height: theme.spacing(8),
+    marginRight: theme.spacing(3)
   },
   body: {
-    marginTop: theme.spacing(8),
+    marginTop: theme.spacing(14),
     marginLeft: theme.spacing(4),
     marginRight: theme.spacing(4)
   },
@@ -37,7 +45,10 @@ const Index = function({provider}) {
 
   return (
     <React.Fragment>
-      <div className={classes.header}>My Ethereum Tools</div>
+      <div className={classes.header}>
+        <img className={classes.logo} src='/static/logo.png' />
+        <div>My Ethereum Tools</div>
+      </div>
       <div className={classes.body}>
         <div className={classes.line}>
           <TextField
@@ -54,7 +65,7 @@ const Index = function({provider}) {
             variant='outlined'
             color='secondary'
             className={classes.btn}
-            onClick={_ => providerSign(provider, jsonHash(inputObj)).then(setSig)}>
+            onClick={_ => providerSignObj(provider, JSON.parse(inputObj)).then(setSig)}>
             JSON sign
           </Button>
           <TextField
