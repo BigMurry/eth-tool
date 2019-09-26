@@ -4,7 +4,8 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import grey from '@material-ui/core/colors/grey';
 import { connect } from 'react-redux';
-import {providerSignObj} from '../lib/core';
+import clsx from 'clsx';
+import {signJSONFromSeed} from '../lib/core';
 
 const useStyles = makeStyles(theme => ({
   header: {
@@ -28,19 +29,35 @@ const useStyles = makeStyles(theme => ({
     marginLeft: theme.spacing(4),
     marginRight: theme.spacing(4)
   },
-  textField: {
+  lgTx: {
+    width: theme.spacing(80)
+  },
+  mdTx: {
     width: theme.spacing(50)
+  },
+  smTx: {
+    width: theme.spacing(20)
+  },
+  mgRight: {
+    marginRight: theme.spacing(10)
+  },
+  block: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center'
   },
   line: {
     display: 'flex',
-    flexDirection: 'column',
     alignItems: 'center'
   }
 }));
 
 const Index = function({provider}) {
   const classes = useStyles();
-  const [inputObj, setInputObj] = useState('');
+  const [json, setJson] = useState('');
+  const [seeds, setSeeds] = useState('');
+  const [seedIdx, setSeedIdx] = useState(0);
+  const [address, setAddress] = useState('');
   const [sig, setSig] = useState('');
 
   return (
@@ -50,22 +67,57 @@ const Index = function({provider}) {
         <div>My Ethereum Tools</div>
       </div>
       <div className={classes.body}>
-        <div className={classes.line}>
+        <div className={classes.block}>
           <TextField
             multiline
-            id='input-box'
-            label='Input Object'
-            className={classes.textField}
-            value={inputObj}
-            onChange={e => setInputObj(e.target.value)}
+            id='seeds'
+            label='Input Seeds'
+            className={classes.lgTx}
+            value={seeds}
+            onChange={e => setSeeds(e.target.value)}
+            margin='normal'
+            variant='outlined'
+          />
+          <div className={classes.line}>
+            <TextField
+              id='seed-idx'
+              label='Input Seed Index'
+              className={clsx(classes.smTx, classes.mgRight)}
+              value={seedIdx}
+              onChange={e => setSeedIdx(e.target.value)}
+              margin='normal'
+              variant='outlined'
+            />
+            <TextField
+              disabled
+              id='address'
+              label='address'
+              className={classes.mdTx}
+              value={address}
+              margin='normal'
+              variant='outlined'
+            />
+          </div>
+          <TextField
+            multiline
+            id='json'
+            label='Input JSON Object'
+            className={classes.lgTx}
+            value={json}
+            onChange={e => setJson(e.target.value)}
             margin='normal'
             variant='outlined'
           />
           <Button
-            variant='outlined'
+            size={'large'}
+            variant='contained'
             color='secondary'
             className={classes.btn}
-            onClick={_ => providerSignObj(provider, JSON.parse(inputObj)).then(setSig)}>
+            onClick={_ => {
+              const {sig: {signature}, address} = signJSONFromSeed(seeds, seedIdx, JSON.parse(json));
+              setSig(signature);
+              setAddress(address);
+            }}>
             JSON sign
           </Button>
           <TextField
@@ -73,7 +125,7 @@ const Index = function({provider}) {
             disabled
             id='output-box'
             label='Signature'
-            className={classes.textField}
+            className={classes.lgTx}
             value={sig}
             margin='normal'
             variant='outlined'
