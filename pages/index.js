@@ -1,11 +1,11 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import grey from '@material-ui/core/colors/grey';
 import { connect } from 'react-redux';
 import clsx from 'clsx';
-import {signJSONFromSeed} from '../lib/core';
+import {signJSON, decodeSeed, validSeedOrPrivKey} from '../lib/core';
 
 const useStyles = makeStyles(theme => ({
   header: {
@@ -52,13 +52,25 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+function usePrivKey(seed, idx) {
+  const [account, setAccount] = useState({privKey: '', address: ''});
+  useEffect(() => {
+    if (validSeedOrPrivKey(seed)) {
+      setAccount(decodeSeed(seed, idx));
+    } else {
+      setAccount({privKey: '', address: ''});
+    }
+  }, [seed, idx]);
+  return account;
+}
+
 const Index = function({provider}) {
   const classes = useStyles();
   const [json, setJson] = useState('');
-  const [seeds, setSeeds] = useState('');
+  const [seedOrPrivKey, setSeedOrPrivKey] = useState('');
   const [seedIdx, setSeedIdx] = useState(0);
-  const [address, setAddress] = useState('');
   const [sig, setSig] = useState('');
+  const {privKey, address} = usePrivKey(seedOrPrivKey, seedIdx);
 
   return (
     <React.Fragment>
@@ -71,10 +83,10 @@ const Index = function({provider}) {
           <TextField
             multiline
             id='seeds'
-            label='Input Seeds'
+            label='Seed words or private key'
             className={classes.lgTx}
-            value={seeds}
-            onChange={e => setSeeds(e.target.value)}
+            value={seedOrPrivKey}
+            onChange={e => setSeedOrPrivKey(e.target.value)}
             margin='normal'
             variant='outlined'
           />
@@ -114,9 +126,10 @@ const Index = function({provider}) {
             color='secondary'
             className={classes.btn}
             onClick={_ => {
-              const {sig: {signature}, address} = signJSONFromSeed(seeds, seedIdx, JSON.parse(json));
-              setSig(signature);
-              setAddress(address);
+              try {
+                const {signature} = signJSON(privKey, JSON.parse(json));
+                setSig(signature);
+              } catch (e) {}
             }}>
             JSON sign
           </Button>

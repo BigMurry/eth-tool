@@ -4,14 +4,16 @@
 /*!*********************!*\
   !*** ./lib/core.js ***!
   \*********************/
-/*! exports provided: jsonHash, sign, signJSONFromSeed, providerSignObj */
+/*! exports provided: jsonHash, sign, validSeedOrPrivKey, decodeSeed, signJSON, providerSignObj */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* WEBPACK VAR INJECTION */(function(Buffer) {/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "jsonHash", function() { return jsonHash; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "sign", function() { return sign; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "signJSONFromSeed", function() { return signJSONFromSeed; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "validSeedOrPrivKey", function() { return validSeedOrPrivKey; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "decodeSeed", function() { return decodeSeed; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "signJSON", function() { return signJSON; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "providerSignObj", function() { return providerSignObj; });
 /* harmony import */ var _babel_runtime_corejs2_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime-corejs2/regenerator */ "./node_modules/@babel/runtime-corejs2/regenerator/index.js");
 /* harmony import */ var _babel_runtime_corejs2_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_corejs2_regenerator__WEBPACK_IMPORTED_MODULE_0__);
@@ -52,19 +54,41 @@ function sign(privateKey, msgHash) {
   ret.s = '0x' + ret.s;
   return ret;
 }
-function signJSONFromSeed(seeds, idx, obj) {
-  var _toHDPrivateKey = new bitcore_mnemonic__WEBPACK_IMPORTED_MODULE_5___default.a(seeds).toHDPrivateKey(),
-      xprivkey = _toHDPrivateKey.xprivkey;
+function validSeedOrPrivKey(seedOrPrivKey) {
+  return /^(?:0x)?[0-9a-fA-F]{64}$/.test(seedOrPrivKey) || ethers__WEBPACK_IMPORTED_MODULE_2__["utils"].HDNode.isValidMnemonic(seedOrPrivKey);
+}
+function decodeSeed(seedOrPrivKey, idx) {
+  var privKey = '';
+  var address = '';
 
-  var hdKey = Object(ethereumjs_wallet_hdkey__WEBPACK_IMPORTED_MODULE_6__["fromExtendedKey"])(xprivkey);
-  var ethereumNode = hdKey.derivePath(BIP44_PATH);
-  var wallet = ethereumNode.deriveChild(idx).getWallet();
-  var hash = jsonHash(obj);
-  var sig = sign(wallet.getPrivateKey(), hash);
+  try {
+    if (!/^(?:0x)?[0-9a-fA-F]{64}$/.test(seedOrPrivKey)) {
+      // not privKey
+      var _toHDPrivateKey = new bitcore_mnemonic__WEBPACK_IMPORTED_MODULE_5___default.a(seedOrPrivKey).toHDPrivateKey(),
+          xprivkey = _toHDPrivateKey.xprivkey;
+
+      var hdKey = Object(ethereumjs_wallet_hdkey__WEBPACK_IMPORTED_MODULE_6__["fromExtendedKey"])(xprivkey);
+      var ethereumNode = hdKey.derivePath(BIP44_PATH);
+      var wallet = ethereumNode.deriveChild(idx).getWallet();
+      privKey = wallet.getPrivateKey();
+    } else {
+      privKey = Buffer.from(seedOrPrivKey.replace(/^0x/, ''), 'hex');
+    }
+
+    address = '0x' + Object(ethereumjs_util__WEBPACK_IMPORTED_MODULE_4__["privateToAddress"])(privKey).toString('hex');
+  } catch (e) {
+    console.log(e);
+  }
+
   return {
-    sig: sig,
-    address: '0x' + wallet.getAddress().toString('hex')
+    privKey: privKey,
+    address: address
   };
+}
+function signJSON(privKey, obj) {
+  var hash = jsonHash(obj);
+  var sig = sign(privKey, hash);
+  return sig;
 }
 function providerSignObj(_x, _x2) {
   return _providerSignObj.apply(this, arguments);
@@ -92232,41 +92256,62 @@ var useStyles = Object(_material_ui_core_styles__WEBPACK_IMPORTED_MODULE_1__["ma
   };
 });
 
+function usePrivKey(seed, idx) {
+  var _useState = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])({
+    privKey: '',
+    address: ''
+  }),
+      account = _useState[0],
+      setAccount = _useState[1];
+
+  Object(react__WEBPACK_IMPORTED_MODULE_0__["useEffect"])(function () {
+    if (Object(_lib_core__WEBPACK_IMPORTED_MODULE_7__["validSeedOrPrivKey"])(seed)) {
+      setAccount(Object(_lib_core__WEBPACK_IMPORTED_MODULE_7__["decodeSeed"])(seed, idx));
+    } else {
+      setAccount({
+        privKey: '',
+        address: ''
+      });
+    }
+  }, [seed, idx]);
+  return account;
+}
+
 var Index = function Index(_ref) {
   var provider = _ref.provider;
   var classes = useStyles();
 
-  var _useState = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])(''),
-      json = _useState[0],
-      setJson = _useState[1];
-
   var _useState2 = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])(''),
-      seeds = _useState2[0],
-      setSeeds = _useState2[1];
+      json = _useState2[0],
+      setJson = _useState2[1];
 
-  var _useState3 = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])(0),
-      seedIdx = _useState3[0],
-      setSeedIdx = _useState3[1];
+  var _useState3 = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])(''),
+      seedOrPrivKey = _useState3[0],
+      setSeedOrPrivKey = _useState3[1];
 
-  var _useState4 = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])(''),
-      address = _useState4[0],
-      setAddress = _useState4[1];
+  var _useState4 = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])(0),
+      seedIdx = _useState4[0],
+      setSeedIdx = _useState4[1];
 
   var _useState5 = Object(react__WEBPACK_IMPORTED_MODULE_0__["useState"])(''),
       sig = _useState5[0],
       setSig = _useState5[1];
 
+  var _usePrivKey = usePrivKey(seedOrPrivKey, seedIdx),
+      privKey = _usePrivKey.privKey,
+      address = _usePrivKey.address;
+
   return __jsx(react__WEBPACK_IMPORTED_MODULE_0___default.a.Fragment, {
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 64
+      lineNumber: 76
     },
     __self: this
   }, __jsx("div", {
     className: classes.header,
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 65
+      lineNumber: 77
     },
     __self: this
   }, __jsx("img", {
@@ -92274,50 +92319,50 @@ var Index = function Index(_ref) {
     src: "".concat("", "/static/logo.png"),
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 66
+      lineNumber: 78
     },
     __self: this
   }), __jsx("div", {
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 67
+      lineNumber: 79
     },
     __self: this
   }, "My Ethereum Tools")), __jsx("div", {
     className: classes.body,
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 69
+      lineNumber: 81
     },
     __self: this
   }, __jsx("div", {
     className: classes.block,
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 70
+      lineNumber: 82
     },
     __self: this
   }, __jsx(_material_ui_core_TextField__WEBPACK_IMPORTED_MODULE_2__["default"], {
     multiline: true,
     id: "seeds",
-    label: "Input Seeds",
+    label: "Seed words or private key",
     className: classes.lgTx,
-    value: seeds,
+    value: seedOrPrivKey,
     onChange: function onChange(e) {
-      return setSeeds(e.target.value);
+      return setSeedOrPrivKey(e.target.value);
     },
     margin: "normal",
     variant: "outlined",
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 71
+      lineNumber: 83
     },
     __self: this
   }), __jsx("div", {
     className: classes.line,
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 81
+      lineNumber: 93
     },
     __self: this
   }, __jsx(_material_ui_core_TextField__WEBPACK_IMPORTED_MODULE_2__["default"], {
@@ -92332,7 +92377,7 @@ var Index = function Index(_ref) {
     variant: "outlined",
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 82
+      lineNumber: 94
     },
     __self: this
   }), __jsx(_material_ui_core_TextField__WEBPACK_IMPORTED_MODULE_2__["default"], {
@@ -92345,7 +92390,7 @@ var Index = function Index(_ref) {
     variant: "outlined",
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 91
+      lineNumber: 103
     },
     __self: this
   })), __jsx(_material_ui_core_TextField__WEBPACK_IMPORTED_MODULE_2__["default"], {
@@ -92361,7 +92406,7 @@ var Index = function Index(_ref) {
     variant: "outlined",
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 101
+      lineNumber: 113
     },
     __self: this
   }), __jsx(_material_ui_core_Button__WEBPACK_IMPORTED_MODULE_3__["default"], {
@@ -92370,16 +92415,16 @@ var Index = function Index(_ref) {
     color: "secondary",
     className: classes.btn,
     onClick: function onClick(_) {
-      var _signJSONFromSeed = Object(_lib_core__WEBPACK_IMPORTED_MODULE_7__["signJSONFromSeed"])(seeds, seedIdx, JSON.parse(json)),
-          signature = _signJSONFromSeed.sig.signature,
-          address = _signJSONFromSeed.address;
+      try {
+        var _signJSON = Object(_lib_core__WEBPACK_IMPORTED_MODULE_7__["signJSON"])(privKey, JSON.parse(json)),
+            signature = _signJSON.signature;
 
-      setSig(signature);
-      setAddress(address);
+        setSig(signature);
+      } catch (e) {}
     },
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 111
+      lineNumber: 123
     },
     __self: this
   }, "JSON sign"), __jsx(_material_ui_core_TextField__WEBPACK_IMPORTED_MODULE_2__["default"], {
@@ -92393,7 +92438,7 @@ var Index = function Index(_ref) {
     variant: "outlined",
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 123
+      lineNumber: 136
     },
     __self: this
   }))));
