@@ -93,7 +93,7 @@ const Index = function({provider}) {
           <div className={classes.line}>
             <TextField
               id='seed-idx'
-              label='Input Seed Index'
+              label='Wallet Index'
               className={clsx(classes.smTx, classes.mgRight)}
               value={seedIdx}
               onChange={e => setSeedIdx(e.target.value)}
@@ -113,7 +113,7 @@ const Index = function({provider}) {
           <TextField
             multiline
             id='json'
-            label='Input JSON Object'
+            label='JSON Object to Sign'
             className={classes.lgTx}
             value={json}
             onChange={e => setJson(e.target.value)}
