@@ -56,7 +56,7 @@ function decodeTx(rawTx) {
 
 let Decode = function() {
   const classes = useStyles();
-  const [rawTx, setRawTx] = useState('0xf8aa098501dcd6500083015f9094dac17f958d2ee523a2206206994597c13d831ec780b844a9059cbb000000000000000000000000f8a73320e1a463cd9ac1bf8953e332428218b47600000000000000000000000000000000000000000000000000000000625773a026a0caff69431f28238518ecd11f380cfc01088679d7baef48f8e1512c048dbe7aa9a0654c8fdd7ba37cfd75e6edc261a9f929e6cea7d8f983bf81d231b8f74d807b5a');
+  const [rawTx, setRawTx] = useState('');
   const [plainTx, setPlainTx] = useState('');
   return (
     <Root>
