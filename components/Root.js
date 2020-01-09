@@ -42,10 +42,10 @@ function Root({children}) {
         <img className={classes.logo} src={`${process.env.BACKEND_URL}/static/logo.png`} />
         <div>My Ethereum Tools</div>
         <div className={classes.links}>
-          <Link href='/'>
+          <Link href={`${process.env.BACKEND_URL}/`}>
             <a className={classes.anchor}>sign</a>
           </Link>
-          <Link href='/decode'>
+          <Link href={`${process.env.BACKEND_URL}/decode`}>
             <a className={classes.anchor}>decode</a>
           </Link>
         </div>

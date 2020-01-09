@@ -93,7 +93,7 @@ function Root(_ref) {
     },
     __self: this
   }, __jsx(next_link__WEBPACK_IMPORTED_MODULE_3___default.a, {
-    href: "/",
+    href: "".concat("", "/"),
     __source: {
       fileName: _jsxFileName,
       lineNumber: 45
@@ -107,7 +107,7 @@ function Root(_ref) {
     },
     __self: this
   }, "sign")), __jsx(next_link__WEBPACK_IMPORTED_MODULE_3___default.a, {
-    href: "/decode",
+    href: "".concat("", "/decode"),
     __source: {
       fileName: _jsxFileName,
       lineNumber: 48
@@ -58886,18 +58886,6 @@ var Decode = function Decode() {
 
 /***/ }),
 
-/***/ 0:
-/*!*********************************************************************************************************************************!*\
-  !*** multi next-client-pages-loader?page=%2Fdecode&absolutePagePath=%2FUsers%2Fadmin%2FProjects%2Feth-tool%2Fpages%2Fdecode.js ***!
-  \*********************************************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(/*! next-client-pages-loader?page=%2Fdecode&absolutePagePath=%2FUsers%2Fadmin%2FProjects%2Feth-tool%2Fpages%2Fdecode.js! */"./node_modules/next/dist/build/webpack/loaders/next-client-pages-loader.js?page=%2Fdecode&absolutePagePath=%2FUsers%2Fadmin%2FProjects%2Feth-tool%2Fpages%2Fdecode.js!./");
-
-
-/***/ }),
-
 /***/ 1:
 /*!************************!*\
   !*** buffer (ignored) ***!
@@ -58942,6 +58930,18 @@ module.exports = __webpack_require__(/*! next-client-pages-loader?page=%2Fdecode
 
 /***/ }),
 
+/***/ 5:
+/*!*********************************************************************************************************************************!*\
+  !*** multi next-client-pages-loader?page=%2Fdecode&absolutePagePath=%2FUsers%2Fadmin%2FProjects%2Feth-tool%2Fpages%2Fdecode.js ***!
+  \*********************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(/*! next-client-pages-loader?page=%2Fdecode&absolutePagePath=%2FUsers%2Fadmin%2FProjects%2Feth-tool%2Fpages%2Fdecode.js! */"./node_modules/next/dist/build/webpack/loaders/next-client-pages-loader.js?page=%2Fdecode&absolutePagePath=%2FUsers%2Fadmin%2FProjects%2Feth-tool%2Fpages%2Fdecode.js!./");
+
+
+/***/ }),
+
 /***/ "dll-reference dll_129a35c7ec57967eb265":
 /*!*******************************************!*\
   !*** external "dll_129a35c7ec57967eb265" ***!
@@ -58953,5 +58953,5 @@ module.exports = dll_129a35c7ec57967eb265;
 
 /***/ })
 
-},[[0,"static/runtime/webpack.js"]]]);
+},[[5,"static/runtime/webpack.js"]]]);
 //# sourceMappingURL=decode.js.map
