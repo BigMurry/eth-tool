@@ -16,8 +16,11 @@
   "dependencies": {
     "@material-ui/core": "^4.4.3",
     "@material-ui/styles": "^4.4.3",
+    "bignumber.js": "^9.0.0",
     "bitcore-mnemonic": "^8.8.1",
     "clsx": "^1.0.4",
+    "ethereum-tx-decoder": "^3.0.0",
+    "ethereumjs-tx": "^2.1.2",
     "ethereumjs-util": "^6.1.0",
     "ethereumjs-wallet": "^0.6.3",
     "ethers": "^4.0.37",
@@ -32,7 +35,8 @@
     "react-redux": "^7.1.1",
     "redux-actions": "^2.6.5",
     "redux-devtools-extension": "^2.13.8",
-    "redux-saga": "^1.1.1"
+    "redux-saga": "^1.1.1",
+    "traverse": "^0.6.6"
   },
   "devDependencies": {
     "xhstandard": "^2.0.0"

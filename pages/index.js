@@ -6,6 +6,7 @@ import grey from '@material-ui/core/colors/grey';
 import { connect } from 'react-redux';
 import clsx from 'clsx';
 import {signJSON, decodeSeed, validSeedOrPrivKey} from '../lib/core';
+import Root from '../components/Root';
 
 const useStyles = makeStyles(theme => ({
   header: {
@@ -73,79 +74,73 @@ const Index = function({provider}) {
   const {privKey, address} = usePrivKey(seedOrPrivKey, seedIdx);
 
   return (
-    <React.Fragment>
-      <div className={classes.header}>
-        <img className={classes.logo} src={`${process.env.BACKEND_URL}/static/logo.png`} />
-        <div>My Ethereum Tools</div>
-      </div>
-      <div className={classes.body}>
-        <div className={classes.block}>
+    <Root>
+      <div className={classes.block}>
+        <TextField
+          multiline
+          id='seeds'
+          label='Seed words or private key'
+          className={classes.lgTx}
+          value={seedOrPrivKey}
+          onChange={e => setSeedOrPrivKey(e.target.value)}
+          margin='normal'
+          variant='outlined'
+        />
+        <div className={classes.line}>
           <TextField
-            multiline
-            id='seeds'
-            label='Seed words or private key'
-            className={classes.lgTx}
-            value={seedOrPrivKey}
-            onChange={e => setSeedOrPrivKey(e.target.value)}
+            id='seed-idx'
+            label='Wallet Index'
+            className={clsx(classes.smTx, classes.mgRight)}
+            value={seedIdx}
+            onChange={e => setSeedIdx(e.target.value)}
             margin='normal'
             variant='outlined'
           />
-          <div className={classes.line}>
-            <TextField
-              id='seed-idx'
-              label='Wallet Index'
-              className={clsx(classes.smTx, classes.mgRight)}
-              value={seedIdx}
-              onChange={e => setSeedIdx(e.target.value)}
-              margin='normal'
-              variant='outlined'
-            />
-            <TextField
-              disabled
-              id='address'
-              label='address'
-              className={classes.mdTx}
-              value={address}
-              margin='normal'
-              variant='outlined'
-            />
-          </div>
           <TextField
-            multiline
-            id='json'
-            label='JSON Object to Sign'
-            className={classes.lgTx}
-            value={json}
-            onChange={e => setJson(e.target.value)}
-            margin='normal'
-            variant='outlined'
-          />
-          <Button
-            size={'large'}
-            variant='contained'
-            color='secondary'
-            className={classes.btn}
-            onClick={_ => {
-              try {
-                const {signature} = signJSON(privKey, JSON.parse(json));
-                setSig(signature);
-              } catch (e) {}
-            }}>
-            JSON sign
-          </Button>
-          <TextField
-            multiline
             disabled
-            id='output-box'
-            label='Signature'
-            className={classes.lgTx}
-            value={sig}
+            id='address'
+            label='address'
+            className={classes.mdTx}
+            value={address}
             margin='normal'
             variant='outlined'
           />
         </div>
+        <TextField
+          multiline
+          id='json'
+          label='JSON Object to Sign'
+          className={classes.lgTx}
+          value={json}
+          onChange={e => setJson(e.target.value)}
+          margin='normal'
+          variant='outlined'
+        />
+        <Button
+          size={'large'}
+          variant='contained'
+          color='secondary'
+          className={classes.btn}
+          onClick={_ => {
+            try {
+              const {signature} = signJSON(privKey, JSON.parse(json));
+              setSig(signature);
+            } catch (e) {}
+          }}>
+          JSON sign
+        </Button>
+        <TextField
+          multiline
+          disabled
+          id='output-box'
+          label='Signature'
+          className={classes.lgTx}
+          value={sig}
+          margin='normal'
+          variant='outlined'
+        />
       </div>
-    </React.Fragment>
+    </Root>
   );
 };
 
