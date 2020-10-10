@@ -55,9 +55,12 @@ function decodeTx(rawTx, txType) {
   tx.gasPrice = tx.gasPrice.toString();
   tx.gasLimit = tx.gasLimit.toString();
   tx.value = tx.value.toString();
-  tx.hash = ethers.utils.keccak256(rawTx);
+  const hash = ethers.utils.keccak256(rawTx);
   return Object.assign(
-    {from: '0x' + ethTx.getSenderAddress().toString('hex')},
+    {
+      hash,
+      from: '0x' + ethTx.getSenderAddress().toString('hex')
+    },
     tx
   );
 }
