@@ -10,6 +10,7 @@ import txDecoder from 'ethereum-tx-decoder';
 import {Transaction as Tx} from 'ethereumjs-tx';
 import BN from 'bignumber.js';
 import traverse from 'traverse';
+import * as ethers from 'ethers';
 
 import Root from '../components/Root';
 import {v2 as abi} from '../lib/erc20-abi';
@@ -54,6 +55,7 @@ function decodeTx(rawTx, txType) {
   tx.gasPrice = tx.gasPrice.toString();
   tx.gasLimit = tx.gasLimit.toString();
   tx.value = tx.value.toString();
+  tx.hash = ethers.utils.keccak256(rawTx);
   return Object.assign(
     {from: '0x' + ethTx.getSenderAddress().toString('hex')},
     tx
