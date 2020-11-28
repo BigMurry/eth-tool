@@ -8,12 +8,17 @@ import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import txDecoder from 'ethereum-tx-decoder';
 import {Transaction as Tx} from 'ethereumjs-tx';
+import { Api, JsonRpc } from 'eosjs';
+import fetch from 'isomorphic-unfetch';
+import { decode } from 'ripple-binary-codec';
+import { transactionID } from 'ripple-binary-codec/distrib/npm/hashes';
 import BN from 'bignumber.js';
 import traverse from 'traverse';
 import * as ethers from 'ethers';
 
 import Root from '../components/Root';
 import {v2 as abi} from '../lib/erc20-abi';
+require('buffer');
 
 const useStyles = makeStyles(theme => ({
   cont: {
@@ -44,7 +49,60 @@ function formatEventValues(values, precision = 1e0) {
   return ret;
 }
 
-function decodeTx(rawTx, txType) {
+async function decodeEos(
+  rawTx,
+  eosNode = 'https://api.eossweden.org',
+  chainId = 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906'
+) {
+  const rpc = new JsonRpc(eosNode, { fetch });
+  const api = new Api({
+    rpc,
+    // signatureProvider: new SignatureProvider(),
+    chainId,
+    textEncoder: new TextEncoder(),
+    textDecoder: new TextDecoder()
+  });
+  const res = await api.deserializeTransactionWithActions(rawTx);
+  const hash = await eosHash(rawTx);
+  return Object.assign({hash}, res);
+}
+
+function xrpHash(raw) {
+  return transactionID(Buffer.from(raw, 'hex')).toString('hex');
+}
+
+const fromHexString = hexString =>
+  new Uint8Array(hexString.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+
+// https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest
+async function eosHash(hex) {
+  const hashBuffer = await window.crypto.subtle.digest('SHA-256', fromHexString(hex)); // hash the message
+  const hashArray = Array.from(new Uint8Array(hashBuffer)); // convert buffer to byte array
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join(''); // convert bytes to hex string
+  return hashHex;
+}
+
+function decodeXrp(rawTx) {
+  const hash = xrpHash(rawTx);
+  return Object.assign({hash}, decode(rawTx));
+}
+
+async function decodeTx(rawTx, txType) {
+  if (txType === TX_TYPES.DEFAULT || txType === TX_TYPES.ERC20) {
+    return decodeEth(rawTx, txType);
+  }
+  if (txType === TX_TYPES.XRP) {
+    return decodeXrp(rawTx);
+  }
+  if (txType === TX_TYPES.EOS) {
+    return decodeEos(rawTx);
+  }
+  return {
+    error: 'NOT support'
+  };
+}
+
+function decodeEth(rawTx, txType) {
   const ethTx = new Tx(rawTx);
   const tx = txDecoder.decodeTx(rawTx);
   if (txType === TX_TYPES.ERC20) {
@@ -67,7 +125,9 @@ function decodeTx(rawTx, txType) {
 
 const TX_TYPES = {
   DEFAULT: 10,
-  ERC20: 20
+  ERC20: 20,
+  XRP: 30,
+  EOS: 40
 };
 
 let Decode = function() {
@@ -100,7 +160,6 @@ let Decode = function() {
             Tx type
           </InputLabel>
           <Select
-            labelId='tx-type-label'
             id='tx-type-select'
             value={txType}
             onChange={e => setTxType(e.target.value)}
@@ -110,6 +169,8 @@ let Decode = function() {
               <em>Eth default</em>
             </MenuItem>
             <MenuItem value={TX_TYPES.ERC20}>ERC20</MenuItem>
+            <MenuItem value={TX_TYPES.XRP}>XRP</MenuItem>
+            <MenuItem value={TX_TYPES.EOS}>EOS</MenuItem>
           </Select>
         </FormControl>
         <Button
@@ -117,11 +178,15 @@ let Decode = function() {
           variant='contained'
           color='secondary'
           className={classes.btn}
-          onClick={_ => {
+          onClick={async _ => {
+            setPlainTx('waiting...');
             try {
-              const tx = decodeTx(rawTx, txType);
+              const tx = await decodeTx(rawTx, txType);
               setPlainTx(JSON.stringify(tx, null, 2));
-            } catch (e) {}
+            } catch (e) {
+              setPlainTx(`error message: ${e.message || e}`);
+              console.log(e);
+            }
           }}>
           Decode Tx
         </Button>

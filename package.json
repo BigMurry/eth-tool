@@ -18,12 +18,15 @@
     "@material-ui/styles": "^4.4.3",
     "bignumber.js": "^9.0.0",
     "bitcore-mnemonic": "^8.8.1",
+    "buffer": "^6.0.3",
     "clsx": "^1.0.4",
+    "eosjs": "^21.0.3",
     "ethereum-tx-decoder": "^3.0.0",
     "ethereumjs-tx": "^2.1.2",
     "ethereumjs-util": "^6.1.0",
     "ethereumjs-wallet": "^0.6.3",
     "ethers": "^4.0.37",
+    "isomorphic-unfetch": "^3.1.0",
     "json-stable-stringify": "^1.0.1",
     "lodash": "^4.17.15",
     "next": "^9.3.3",
@@ -36,6 +39,7 @@
     "redux-actions": "^2.6.5",
     "redux-devtools-extension": "^2.13.8",
     "redux-saga": "^1.1.1",
+    "ripple-binary-codec": "0.2",
     "traverse": "^0.6.6"
   },
   "devDependencies": {
