@@ -16,12 +16,6 @@ import { connect, useWallet } from './useWallet';
 import { shortAddr } from '../lib/share';
 
 const useStyles = makeStyles(theme => ({
-  page: {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
   header: {
     display: 'flex',
     justifyContent: 'space-between',
@@ -38,8 +32,9 @@ const useStyles = makeStyles(theme => ({
     marginRight: theme.spacing(3)
   },
   body: {
-    width: '680px',
-    margin: `${theme.spacing(10)}px ${theme.spacing(2)}px 0 ${theme.spacing(2)}px`
+    margin: `${theme.spacing(10)}px auto 0 auto`,
+    maxWidth: '680px',
+    padding: `0px ${theme.spacing(2)}px 0 ${theme.spacing(2)}px`
   },
   links: {
     backgroundColor: 'rgba(220,220,220,0.6)',

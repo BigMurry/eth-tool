@@ -30,9 +30,7 @@ require('buffer');
 const useStyles = makeStyles(theme => ({
   cont: {
     display: 'flex',
-    flexDirection: 'column',
-    maxWidth: '800px',
-    margin: 'auto'
+    flexDirection: 'column'
   },
   btn: {
     margin: '10px 0 60px 0'
