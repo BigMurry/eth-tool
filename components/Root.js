@@ -58,8 +58,8 @@ function Root ({ children }) {
       <div className={classes.header}>
         <img className={classes.logo} src={`${process.env.BACKEND_URL}/static/logo.png`} />
         {!account && (
-          <Button onClick={e => connect()}>
-            Connect
+          <Button variant='outlined' color='secondary' onClick={e => connect()}>
+            Connect Wallet
           </Button>
         )}
         {
