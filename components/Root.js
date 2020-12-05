@@ -35,7 +35,7 @@ const useStyles = makeStyles(theme => ({
   },
   body: {
     width: '680px',
-    margin: `${theme.spacing(20)}px ${theme.spacing(2)}px 0 ${theme.spacing(2)}px`
+    margin: `${theme.spacing(10)}px ${theme.spacing(2)}px 0 ${theme.spacing(2)}px`
   },
   links: {
     backgroundColor: 'rgba(220,220,220,0.6)',
@@ -43,7 +43,8 @@ const useStyles = makeStyles(theme => ({
     marginBottom: theme.spacing(2)
   },
   anchor: {
-    marginRight: '10px'
+    marginRight: '10px',
+    fontSize: '1.2em'
   }
 }));
 
