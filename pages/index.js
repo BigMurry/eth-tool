@@ -1,46 +1,22 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import grey from '@material-ui/core/colors/grey';
-import { connect } from 'react-redux';
 import clsx from 'clsx';
-import {signJSON, decodeSeed, validSeedOrPrivKey} from '../lib/core';
+import { signJSON, decodeSeed, validSeedOrPrivKey } from '../lib/core';
+import { useWallet } from '../components/useWallet';
 import Root from '../components/Root';
 
 const useStyles = makeStyles(theme => ({
-  header: {
-    fontSize: theme.spacing(3),
-    position: 'fixed',
-    width: '100%',
-    top: 0,
-    paddingLeft: theme.spacing(3),
-    paddingTop: theme.spacing(1),
-    paddingBottom: theme.spacing(1),
-    backgroundColor: grey[500],
-    display: 'flex',
-    alignItems: 'center'
-  },
-  logo: {
-    height: theme.spacing(8),
-    marginRight: theme.spacing(3)
-  },
-  body: {
-    marginTop: theme.spacing(14),
-    marginLeft: theme.spacing(4),
-    marginRight: theme.spacing(4)
-  },
   lgTx: {
-    width: theme.spacing(80)
+    width: '100%'
   },
   mdTx: {
-    width: theme.spacing(50)
   },
   smTx: {
-    width: theme.spacing(20)
   },
   mgRight: {
-    marginRight: theme.spacing(10)
+    marginRight: theme.spacing(1)
   },
   block: {
     display: 'flex',
@@ -48,30 +24,34 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center'
   },
   line: {
+    marginTop: theme.spacing(2),
     display: 'flex',
-    alignItems: 'center'
+    alignItems: 'center',
+    justifyContent: 'spacing-between',
+    width: '100%'
   }
 }));
 
-function usePrivKey(seed, idx) {
-  const [account, setAccount] = useState({privKey: '', address: ''});
+function usePrivKey (seed, idx) {
+  const [account, setAccount] = useState({ privKey: '', address: '' });
   useEffect(() => {
     if (validSeedOrPrivKey(seed)) {
       setAccount(decodeSeed(seed, idx));
     } else {
-      setAccount({privKey: '', address: ''});
+      setAccount({ privKey: '', address: '' });
     }
   }, [seed, idx]);
   return account;
 }
 
-const Index = function({provider}) {
+const Index = function () {
+  const { state } = useWallet();
   const classes = useStyles();
   const [json, setJson] = useState('');
   const [seedOrPrivKey, setSeedOrPrivKey] = useState('');
   const [seedIdx, setSeedIdx] = useState(0);
   const [sig, setSig] = useState('');
-  const {privKey, address} = usePrivKey(seedOrPrivKey, seedIdx);
+  const { privKey, address } = usePrivKey(seedOrPrivKey, seedIdx);
 
   return (
     <Root>
@@ -83,26 +63,25 @@ const Index = function({provider}) {
           className={classes.lgTx}
           value={seedOrPrivKey}
           onChange={e => setSeedOrPrivKey(e.target.value)}
-          margin='normal'
           variant='outlined'
         />
         <div className={classes.line}>
           <TextField
             id='seed-idx'
             label='Wallet Index'
+            fullWidth
             className={clsx(classes.smTx, classes.mgRight)}
             value={seedIdx}
             onChange={e => setSeedIdx(e.target.value)}
-            margin='normal'
             variant='outlined'
           />
           <TextField
             disabled
             id='address'
             label='address'
+            fullWidth
             className={classes.mdTx}
             value={address}
-            margin='normal'
             variant='outlined'
           />
         </div>
@@ -117,16 +96,18 @@ const Index = function({provider}) {
           variant='outlined'
         />
         <Button
-          size={'large'}
+          size='large'
           variant='contained'
           color='secondary'
           className={classes.btn}
+          fullWidth
           onClick={_ => {
             try {
-              const {signature} = signJSON(privKey, JSON.parse(json));
+              const { signature } = signJSON(privKey, JSON.parse(json));
               setSig(signature);
             } catch (e) {}
-          }}>
+          }}
+        >
           JSON sign
         </Button>
         <TextField
@@ -144,4 +125,4 @@ const Index = function({provider}) {
   );
 };
 
-export default connect(({provider}) => ({provider}))(Index);
+export default Index;

@@ -8,13 +8,12 @@ import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import txDecoder from 'ethereum-tx-decoder';
 import {Transaction as Tx} from 'ethereumjs-tx';
-import { Api, JsonRpc } from 'eosjs';
-import fetch from 'isomorphic-unfetch';
 import { decode } from 'ripple-binary-codec';
 import { transactionID } from 'ripple-binary-codec/distrib/npm/hashes';
 import BN from 'bignumber.js';
 import traverse from 'traverse';
 import * as ethers from 'ethers';
+import * as eosUnpack from 'eos-unpack';
 
 import Root from '../components/Root';
 import {v2 as abi} from '../lib/erc20-abi';
@@ -49,37 +48,8 @@ function formatEventValues(values, precision = 1e0) {
   return ret;
 }
 
-async function decodeEos(
-  rawTx,
-  eosNode = 'https://api.eossweden.org',
-  chainId = 'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906'
-) {
-  const rpc = new JsonRpc(eosNode, { fetch });
-  const api = new Api({
-    rpc,
-    // signatureProvider: new SignatureProvider(),
-    chainId,
-    textEncoder: new TextEncoder(),
-    textDecoder: new TextDecoder()
-  });
-  const res = await api.deserializeTransactionWithActions(rawTx);
-  const hash = await eosHash(rawTx);
-  return Object.assign({hash}, res);
-}
-
 function xrpHash(raw) {
   return transactionID(Buffer.from(raw, 'hex')).toString('hex');
-}
-
-const fromHexString = hexString =>
-  new Uint8Array(hexString.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
-
-// https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest
-async function eosHash(hex) {
-  const hashBuffer = await window.crypto.subtle.digest('SHA-256', fromHexString(hex)); // hash the message
-  const hashArray = Array.from(new Uint8Array(hashBuffer)); // convert buffer to byte array
-  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join(''); // convert bytes to hex string
-  return hashHex;
 }
 
 function decodeXrp(rawTx) {
@@ -95,7 +65,7 @@ async function decodeTx(rawTx, txType) {
     return decodeXrp(rawTx);
   }
   if (txType === TX_TYPES.EOS) {
-    return decodeEos(rawTx);
+    return eosUnpack(rawTx);
   }
   return {
     error: 'NOT support'
