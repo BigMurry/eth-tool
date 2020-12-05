@@ -7,6 +7,8 @@ import Link from 'next/link';
 import Button from '@material-ui/core/Button';
 import Chip from '@material-ui/core/Chip';
 import Avatar from '@material-ui/core/Avatar';
+import GithubIcon from '@material-ui/icons/Github';
+import TipIcon from '@material-ui/icons/ThumbUp';
 
 import makeBlockie from 'ethereum-blockies-base64';
 
@@ -16,7 +18,9 @@ import { shortAddr } from '../lib/share';
 const useStyles = makeStyles(theme => ({
   page: {
     display: 'flex',
-    justifyContent: 'center'
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   header: {
     display: 'flex',
@@ -45,6 +49,17 @@ const useStyles = makeStyles(theme => ({
   anchor: {
     marginRight: '10px',
     fontSize: '1.2em'
+  },
+  footer: {
+    width: '100%',
+    height: theme.spacing(5),
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  fbtn: {
+    margin: `0px ${theme.spacing(2)}px`
   }
 }));
 
@@ -53,6 +68,11 @@ function Root ({ children }) {
   const { state } = useWallet();
   const account = _get(state, ['accounts', 0]);
   const chainId = _get(state, ['chainId']);
+  let provider;
+  try {
+    provider = _get(state, ['provider']);
+    provider = provider.getSigner();
+  } catch (e) { console.log(e.message || e); }
 
   return (
     <div className={classes.page}>
@@ -83,6 +103,32 @@ function Root ({ children }) {
           </Link>
         </div>
         {children}
+      </div>
+      <div className={classes.footer}>
+        <Chip
+          className={classes.fbtn}
+          onClick={e => {
+            e.preventDefault();
+            window.open('https://github.com/BigMurry/eth-tool', '_ blank');
+          }}
+          icon={<GithubIcon />}
+          label='star'
+        />
+        {
+          provider && account && (
+            <Chip
+              className={classes.fbtn}
+              icon={<TipIcon />}
+              onClick={e => {
+                provider.sendTransaction({
+                  to: '0x58e63b7D153E7176fAD2DC3Eab6e73d792F13556',
+                  value: '0x71afd498d0000'
+                });
+              }}
+              label='Tip 0.002Ξ'
+            />
+          )
+        }
       </div>
     </div>
   );

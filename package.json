@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@material-ui/core": "^4.4.3",
+    "@material-ui/icons": "^4.11.2",
     "@material-ui/styles": "^4.4.3",
     "bignumber.js": "^9.0.0",
     "bitcore-mnemonic": "^8.8.1",
