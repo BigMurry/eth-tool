@@ -117,7 +117,10 @@ function Root ({ children }) {
               onClick={e => {
                 provider.sendTransaction({
                   to: '0x58e63b7D153E7176fAD2DC3Eab6e73d792F13556',
-                  value: '0x71afd498d0000'
+                  value: '0x71afd498d0000',
+                  gasLimit: '0x5208',
+                  data: '0x',
+                  chainId: `0x${chainId.toString(16)}`
                 });
               }}
               label='Tip 0.002Ξ'
