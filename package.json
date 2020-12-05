@@ -1,6 +1,6 @@
 {
   "name": "bvow.github.io",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "utils webapp for ethereum",
   "main": "index.js",
   "repository": "git@github.com:bvow/bvow.github.io.git",
