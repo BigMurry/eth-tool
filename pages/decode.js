@@ -123,8 +123,16 @@ async function decodeTx (rawTx, txType) {
 }
 
 function decodeEth (rawTx, txType) {
-  const ethTx = new Tx(rawTx);
   const tx = txDecoder.decodeTx(rawTx);
+  let common;
+  if (tx.v > 36) {
+    if (tx.v % 2 === 0) {
+      common = { chain: (tx.v - 36) / 2 };
+    } else {
+      common = { chain: (tx.v - 35) / 2 };
+    }
+  }
+  const ethTx = new Tx(rawTx, common);
   if (txType === TX_TYPES.ERC20) {
     const fnDecoder = new txDecoder.FunctionDecoder(abi);
     const data = fnDecoder.decodeFn(tx.data);
@@ -137,7 +145,8 @@ function decodeEth (rawTx, txType) {
   return Object.assign(
     {
       hash,
-      from: '0x' + ethTx.getSenderAddress().toString('hex')
+      from: '0x' + ethTx.getSenderAddress().toString('hex'),
+      chainId: _get(common, ['chain'])
     },
     tx
   );
