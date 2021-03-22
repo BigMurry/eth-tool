@@ -123,6 +123,9 @@ async function decodeTx (rawTx, txType) {
 }
 
 function decodeEth (rawTx, txType) {
+  if (!/^0x/.test(rawTx)) {
+    rawTx = '0x' + rawTx;
+  }
   const tx = txDecoder.decodeTx(rawTx);
   let common;
   if (tx.v > 36) {
