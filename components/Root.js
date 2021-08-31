@@ -64,7 +64,6 @@ function Root ({ children }) {
   const account = _get(state, ['accounts', 0]);
   const chainId = _get(state, ['chainId']);
   let provider;
-  console.log("state:", state);
   try {
     provider = _get(state, ['provider']);
     provider = provider.getSigner();
