@@ -1,34 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import _get from 'lodash/get';
+import _uniq from 'lodash/uniq';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import grey from '@material-ui/core/colors/grey';
-import red from '@material-ui/core/colors/red';
-import yellow from '@material-ui/core/colors/yellow';
 
 import txDecoder from 'ethereum-tx-decoder';
 import BN from 'bignumber.js';
 import traverse from 'traverse';
 
 import Root from '../components/Root';
-import abi from '../lib/erc20-abi02';
+import abi from '../lib/uniswap-abi';
 require('buffer');
 
 // 合约地址
 const contratTwo = {
     "0xdac17f958d2ee523a2206206994597c13d831ec7": "USDT",
     "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2": "WETH",
-    "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48": "USDC",
-    "0xb6EE9668771a79be7967ee29a63D4184F8097143": "CXO"
+    "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48": "USDC"
 };
 
 const decimals = {
     "USDT": 6,
     "WETH": 18,
-    "USDC": 6,
-    "CXO": 18
+    "USDC": 6
 };
 
 const useStyles = makeStyles(theme => ({
@@ -60,50 +57,6 @@ const useStyles = makeStyles(theme => ({
     },
     btn: {
         margin: '10px 0 60px 0'
-    },
-    exp: {
-        display: 'flex',
-        backgroundColor: grey[200],
-        padding: theme.spacing(1),
-        borderRadius: '4px',
-        position: 'relative'
-    },
-    lnk: {
-        marginRight: theme.spacing(2)
-    },
-    ready: {
-        backgroundColor: '#44b700',
-        color: '#44b700'
-    },
-    pending: {
-        backgroundColor: yellow[500],
-        color: yellow[500]
-    },
-    failed: {
-        backgroundColor: red[500],
-        color: red[500]
-    },
-    dot: {
-        boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
-        position: 'absolute',
-        top: -theme.spacing(1),
-        left: -theme.spacing(1),
-        width: theme.spacing(2),
-        height: theme.spacing(2),
-        borderRadius: '50%',
-        animation: '$ripple 1.2s infinite ease-in-out',
-        border: '1px solid currentColor',
-        content: '""'
-    },
-    '@keyframes ripple': {
-        '0%': {
-            transform: 'scale(.8)',
-            opacity: 1
-        },
-        '100%': {
-            transform: 'scale(1.6)',
-            opacity: 0
-        }
     }
 }));
 
@@ -150,6 +103,10 @@ function inHandleData(newArr) {
 
 function outHandleData(newArr) {
     let newObj = {};
+    // 判断 unwrapWETH9(uint256,address)
+    if(newArr[2].sighash !== "0x49404b7c") {
+        return { message: "没有WETH，无法检查交易体！" };
+    }
     if (newArr[2].recipient !== newArr[3].recipient) {
         return { message: "受益人不同，请检查交易体！" };
     }
@@ -183,6 +140,11 @@ function decodeTx(rawTx) {
     let newArr = [];
     const fnDecoder = new txDecoder.FunctionDecoder(abi);
     const decode = fnDecoder.decodeFn(rawTx);
+    // 目前仅支持 multicall(bytes[])
+    if(decode.sighash !== "0xac9650d8") {
+        return { message: "目前仅支持 multicall" };
+    }
+
     for (const it of decode.data) {
         const decodeChi = fnDecoder.decodeFn(it);
         const newParams = formatEventValues(decodeChi.params || decodeChi);
@@ -190,13 +152,17 @@ function decodeTx(rawTx) {
     }
     let newObj = {};
     // 判断是出金还是入金
-    const check01 = newArr.filter(it => it.signature === "refundETH()" || it.signature.indexOf("mint((address") > -1);
-    const check02 = newArr.filter(it => it.signature.indexOf("decreaseLiquidity") > -1 || it.signature.indexOf("collect") > -1 || it.signature.indexOf("unwrapWETH9") > -1 || it.signature.indexOf("sweepToken") > -1);
-    // const check02
-    if (check01.length >= 2) {
+    const sighashs = newArr.map(it => it.sighash);
+    const check01 = _uniq(sighashs).reduce((f, s) => {
+        return ["0x88316456", "0x12210e8a"].includes(s) ? f + 1 : f;
+    }, 0);
+    const check02 = _uniq(sighashs).reduce((f, s) => {
+        return ["0xdf2ab5bb", "0x49404b7c", "0xfc6f7865", "0x0c49ccbe"].includes(s) ? f + 1 : f;
+    }, 0);
+    if (sighashs.length === check01 && check01 === 2) {
         newObj.type = "入金";
         newObj = Object.assign(newObj, inHandleData(newArr));
-    } else if (check02.length >= 4) {
+    } else if (sighashs.length === check02 && check02 === 4) {
         newObj.type = "出金";
         newObj = Object.assign(newObj, outHandleData(newArr));
     } else {
@@ -204,13 +170,6 @@ function decodeTx(rawTx) {
     }
     return newObj;
 }
-
-const TX_TYPES = {
-    DEFAULT: 10,
-    ERC20: 20,
-    XRP: 30,
-    EOS: 40
-};
 
 const Decode = function () {
     const classes = useStyles();
