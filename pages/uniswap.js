@@ -57,6 +57,9 @@ const useStyles = makeStyles(theme => ({
     },
     btn: {
         margin: '10px 0 60px 0'
+    },
+    amountFont: {
+        color: 'red'
     }
 }));
 
@@ -227,14 +230,14 @@ const Decode = function () {
                             <div className={classes.lableFont}>交易对：</div>
                             <div className={classes.cont}>
                                 <div>
-                                    {decTx.transactionPair0.name}(
+                                    {decTx.transactionPair0.name}&nbsp;(
                                     <Link href={`https://etherscan.io/address/${decTx.transactionPair0.code}`}>
                                         <a className={classes.anchor}>{decTx.transactionPair0.code}</a>
                                     </Link>
                                     ) ~
                                 </div>
                                 <div>
-                                    {decTx.transactionPair1.name}(
+                                    {decTx.transactionPair1.name}&nbsp;(
                                     <Link href={`https://etherscan.io/address/${decTx.transactionPair1.code}`}>
                                         <a className={classes.anchor}>{decTx.transactionPair1.code}</a>
                                     </Link>
@@ -244,14 +247,14 @@ const Decode = function () {
                         </div>
                         <div className={classes.flexRow}>
                             <div className={classes.lableFont}>受益人地址：</div>
-                            <div>{decTx.recipient0}</div>
+                            <div className={classes.amountFont}>{decTx.recipient0}</div>
                         </div>
                         <div className={classes.flexRow}>
                             <div className={classes.lableFont}>充值数额：</div>
-                            <div>{decTx.amount0.code}:</div>
-                            <div>{decTx.amount0.num}---</div>
-                            <div>{decTx.amount1.code}:</div>
-                            <div>{decTx.amount1.num}</div>
+                            <div>{decTx.amount0.code}：</div>
+                            <div className={classes.amountFont}>{decTx.amount0.num}</div>
+                            <div>&nbsp;&nbsp;~&nbsp;&nbsp;{decTx.amount1.code}：</div>
+                            <div className={classes.amountFont}>{decTx.amount1.num}</div>
                         </div>
                     </>
                 }
