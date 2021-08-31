@@ -64,6 +64,7 @@ function Root ({ children }) {
   const account = _get(state, ['accounts', 0]);
   const chainId = _get(state, ['chainId']);
   let provider;
+  console.log("state:", state);
   try {
     provider = _get(state, ['provider']);
     provider = provider.getSigner();
@@ -95,6 +96,9 @@ function Root ({ children }) {
           </Link>
           <Link href={`${process.env.BACKEND_URL}/decode`}>
             <a className={classes.anchor}>decode</a>
+          </Link>
+          <Link href={`${process.env.BACKEND_URL}/uniswap`}>
+            <a className={classes.anchor}>uniswap</a>
           </Link>
         </div>
         {children}
