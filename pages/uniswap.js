@@ -18,8 +18,8 @@ require('buffer');
 // 合约地址
 const contratTwo = {
     "0xdac17f958d2ee523a2206206994597c13d831ec7": "USDT",
-    "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2": "WETH",
-    "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48": "USDC"
+    "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2": "WETH",
+    "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": "USDC"
 };
 
 const decimals = {
@@ -89,13 +89,14 @@ function inHandleData(newArr) {
         const it = newArr[0];
         const keys = Object.keys(it).filter(re => re.indexOf("token") > -1);
         keys.forEach((key, index) => {
+            const code = contratTwo[it[key].toLocaleLowerCase()];
             newObj[`transactionPair${index}`] = {
-                name: contratTwo[it[key]] || "is null",
+                name: code || "is null",
                 code: it[key]
             };
             newObj[`amount${index}`] = {
-                code: contratTwo[it[key]],
-                num: new BN(it[`amount${index}Desired`]).div(BN(10).pow(decimals[contratTwo[it[key]]])).toString()
+                code,
+                num: new BN(it[`amount${index}Desired`]).div(BN(10).pow(decimals[code])).toString()
             };
         });
         newObj[`recipient${i}`] = it.recipient;
@@ -117,8 +118,9 @@ function outHandleData(newArr) {
         name: "WETH",
         code: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
     };
+    const name = contratTwo[newArr[3].token.toLocaleLowerCase()];
     newObj['transactionPair1'] = {
-        name: contratTwo[newArr[3].token],
+        name,
         code: newArr[3].token
     };
     newObj['amount0'] = {
@@ -126,8 +128,8 @@ function outHandleData(newArr) {
         num: new BN(newArr[2].amountMinimum).div(BN(10).pow(decimals["WETH"])).toString()
     };
     newObj["amount1"] = {
-        code: contratTwo[newArr[3].token],
-        num: new BN(newArr[3].amountMinimum).div(BN(10).pow(decimals[contratTwo[newArr[3].token]])).toString()
+        code: name,
+        num: new BN(newArr[3].amountMinimum).div(BN(10).pow(decimals[name])).toString()
     };
     newObj['recipient0'] = newArr[2].recipient;
     return newObj;
@@ -137,18 +139,29 @@ function decodeTx(rawTx) {
     if (!rawTx) {
         return { message: "请输入Decode数据" };
     }
-    if (!/^0x/.test(rawTx)) {
+    try {
+        rawTx = JSON.parse(rawTx);
+    } catch (error) {
+        rawTx = rawTx;
+    }
+    if (typeof rawTx === "string" && !/^0x/.test(rawTx)) {
         rawTx = '0x' + rawTx;
     }
     let newArr = [];
     const fnDecoder = new txDecoder.FunctionDecoder(abi);
-    const decode = fnDecoder.decodeFn(rawTx);
-    // 目前仅支持 multicall(bytes[])
-    if(decode.sighash !== "0xac9650d8") {
-        return { message: "目前仅支持 multicall" };
+    let decodeRes;
+    if(rawTx instanceof Array) {
+        decodeRes = rawTx;
+    } else {
+        const decode = fnDecoder.decodeFn(rawTx);
+        // 目前仅支持 multicall(bytes[])
+        if(decode.sighash !== "0xac9650d8") {
+            return { message: "目前仅支持 multicall" };
+        }
+        decodeRes = decode.data;
     }
 
-    for (const it of decode.data) {
+    for (const it of decodeRes) {
         const decodeChi = fnDecoder.decodeFn(it);
         const newParams = formatEventValues(decodeChi.params || decodeChi);
         newArr.push(Object.assign({}, newParams, { sighash: decodeChi.sighash, signature: decodeChi.signature }));
