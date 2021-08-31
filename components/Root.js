@@ -96,6 +96,9 @@ function Root ({ children }) {
           <Link href={`${process.env.BACKEND_URL}/decode`}>
             <a className={classes.anchor}>decode</a>
           </Link>
+          <Link href={`${process.env.BACKEND_URL}/uniswap`}>
+            <a className={classes.anchor}>uniswap</a>
+          </Link>
         </div>
         {children}
       </div>

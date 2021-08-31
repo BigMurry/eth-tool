@@ -3,7 +3,8 @@ module.exports = {
   exportPathMap: function() {
     return {
       '/': { page: '/' },
-      '/decode': {page: '/decode'}
+      '/decode': {page: '/decode'},
+      '/uniswap': {page: '/uniswap'}
     };
   }
 };
