@@ -15,13 +15,13 @@ import red from '@material-ui/core/colors/red';
 import yellow from '@material-ui/core/colors/yellow';
 
 import txDecoder from 'ethereum-tx-decoder';
-import { Transaction as Tx } from 'ethereumjs-tx';
 import { decode } from 'ripple-binary-codec';
 import { transactionID } from 'ripple-binary-codec/distrib/npm/hashes';
 import BN from 'bignumber.js';
 import traverse from 'traverse';
 import * as ethers from 'ethers';
 import * as eosUnpack from 'eos-unpack';
+import { parse } from "@ethersproject/transactions"
 
 import Root from '../components/Root';
 import { v2 as abi } from '../lib/erc20-abi';
@@ -126,7 +126,7 @@ function decodeEth (rawTx, txType) {
   if (!/^0x/.test(rawTx)) {
     rawTx = '0x' + rawTx;
   }
-  const tx = txDecoder.decodeTx(rawTx);
+  const tx = parse(rawTx);
   let common;
   if (tx.v > 36) {
     if (tx.v % 2 === 0) {
@@ -135,21 +135,22 @@ function decodeEth (rawTx, txType) {
       common = { chain: (tx.v - 35) / 2 };
     }
   }
-  const ethTx = new Tx(rawTx, common);
   if (txType === TX_TYPES.ERC20) {
     const fnDecoder = new txDecoder.FunctionDecoder(abi);
     const data = fnDecoder.decodeFn(tx.data);
     tx.decodeData = formatEventValues(data);
   }
-  tx.gasPrice = tx.gasPrice.toString();
+  tx.gasPrice = tx.gasPrice?.toString();
   tx.gasLimit = tx.gasLimit.toString();
   tx.value = tx.value.toString();
+  tx.maxPriorityFeePerGas = tx.maxPriorityFeePerGas?.toString();
+  tx.maxFeePerGas = tx.maxFeePerGas?.toString();
   const hash = ethers.utils.keccak256(rawTx);
   return Object.assign(
     {
       hash,
-      from: '0x' + ethTx.getSenderAddress().toString('hex'),
-      chainId: _get(common, ['chain'])
+      from: tx.from,
+      chainId: tx.chainId
     },
     tx
   );
