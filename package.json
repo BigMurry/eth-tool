@@ -29,7 +29,7 @@
     "ethereumjs-wallet": "^0.6.3",
     "ethers": "^5.5.2",
     "json-stable-stringify": "^1.0.1",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "next": "^10.0.3",
     "prop-types": "^15.7.2",
     "react": "^16.9.0",
