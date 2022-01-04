@@ -14,7 +14,6 @@ import grey from '@material-ui/core/colors/grey';
 import red from '@material-ui/core/colors/red';
 import yellow from '@material-ui/core/colors/yellow';
 
-import txDecoder from 'ethereum-tx-decoder';
 import { decode } from 'ripple-binary-codec';
 import { transactionID } from 'ripple-binary-codec/distrib/npm/hashes';
 import BN from 'bignumber.js';
@@ -22,6 +21,7 @@ import traverse from 'traverse';
 import * as ethers from 'ethers';
 import * as eosUnpack from 'eos-unpack';
 import { parse } from "@ethersproject/transactions"
+import { Interface } from "@ethersproject/abi"
 
 import Root from '../components/Root';
 import { v2 as abi } from '../lib/erc20-abi';
@@ -136,9 +136,14 @@ function decodeEth (rawTx, txType) {
     }
   }
   if (txType === TX_TYPES.ERC20) {
-    const fnDecoder = new txDecoder.FunctionDecoder(abi);
-    const data = fnDecoder.decodeFn(tx.data);
-    tx.decodeData = formatEventValues(data);
+    const iface = new Interface(abi);
+    const data = iface.parseTransaction({data: tx.data});
+    tx.decodeData = {
+      to: data.args.to,
+      value: data.args.value.toString(),
+      signature: data.signature,
+      sighash: data.sighash
+    }
   }
   tx.gasPrice = tx.gasPrice?.toString();
   tx.gasLimit = tx.gasLimit.toString();
